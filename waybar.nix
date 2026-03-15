@@ -56,11 +56,11 @@
         };
 
         wireplumber = {
-          format = " {volume}%";
+          format = "  {volume}%";
           "format-muted" = " {volume}%";
-          "on-click" = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-          "on-scroll-up" = "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 1%+";
-          "on-scroll-down" = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-";
+          "on-click" = "swayosd-client --output-volume mute-toggle";
+          "on-scroll-up" = "swayosd-client --output-volume raise";
+          "on-scroll-down" = "swayosd-client --output-volume lower";
         };
 
         cpu = {

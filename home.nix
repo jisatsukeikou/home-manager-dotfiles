@@ -25,6 +25,7 @@
     ./hyprland.nix
     ./hyprlock.nix
     ./rofi.nix
+    ./swayosd.nix
     ./wezterm.nix
     ./waybar.nix
     # catppuccin.homeManagerModules.catppuccin
@@ -46,12 +47,8 @@
     keepass
     kitty
     libreoffice
+    pavucontrol
     slurp
-    steam
-    #telegram-desktop
-    #ayugram-desktop
-    #kotatogram-desktop
-    teams-for-linux
     vscode-fhs
     wezterm
     wl-clipboard
@@ -74,8 +71,6 @@
       enable = true;
       interactiveShellInit = ''
         set fish_greeting
-        adb kill-server
-        adb start-server
       '';
       # plugins = [
       #   # Enable a plugin (here grc for colorized command output) from nixpkgs
@@ -93,6 +88,15 @@
     rofi = {
       enable = true;
       package = pkgs.rofi.override { plugins = [ pkgs.rofi-emoji ]; };
+    };
+  };
+
+  services.hypridle = {
+    enable = true;
+    settings = {
+      general = {
+        ignore_dbus_inhibit = false;
+      };
     };
   };
 }

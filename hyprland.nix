@@ -22,7 +22,6 @@
     enable = true;
     systemd.enable = true;
 
-    #catppuccin.enable = true;
     xwayland = {
       enable = true;
     };
@@ -33,6 +32,7 @@
       "$menu" = "rofi -show drun";
       "$reload" = "hyprctl reload";
       "$fileManager" = "dolphin";
+      "$lock" = "hyprlock";
 
       general = {
         gaps_in = 4;
@@ -41,6 +41,29 @@
         "col.active_border" = "rgba(9ec9ffff)";
         "col.inactive_border" = "rgba(9ec9ff99)";
       };
+
+      windowrule = [
+        {
+          name = "chats";
+          "match:workspace" = "3";
+          monitor = "DP-1";
+        }
+        {
+          name = "tg";
+          "match:class" = "org.telegram.desktop";
+          workspace = 3;
+        }
+        {
+          name = "firefox";
+          "match:class" = "firefox";
+          workspace = 2;
+        }
+        {
+          name = "VPN";
+          "match:class" = "AmneziaVPN";
+          float = "on";
+        }
+      ];
 
       decoration = {
         # See https://wiki.hyprland.org/Configuring/Variables/ for more
@@ -99,6 +122,7 @@
         "$mod, Q, exec, $reload"
         "$mod, V, togglefloating,"
         "$mod, R, exec, $menu"
+        "$mod, L, exec, $lock"
         "$mod, P, pseudo," # dwindle
         "$mod, J, togglesplit," # dwindle
 
@@ -107,6 +131,9 @@
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
+
+        "$mod SHIFT, right, moveworkspacetomonitor, DP-1"
+        "$mod SHIFT, left, moveworkspacetomonitor, DP-2"
 
         # Switch workspaces with mod + [0-9]
         "$mod, 1, workspace, 1"
