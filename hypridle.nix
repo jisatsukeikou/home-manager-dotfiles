@@ -18,14 +18,14 @@
       # 30 minutes (1800s): dim screen
       listener = [
         {
-          timeout = 1800;
+          timeout = 180;
           on-timeout = "brightnessctl -s set 10%";  # save current, set to 10%
           on-resume  = "brightnessctl -r";          # restore previous brightness
         }
 
         # 60 minutes (3600s): turn display off
         {
-          timeout = 3600;
+          timeout = 360;
           on-timeout = "hyprctl dispatch dpms off";
           on-resume  = "hyprctl dispatch dpms on";
         }

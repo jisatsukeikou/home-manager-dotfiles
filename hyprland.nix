@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
   services.hyprpaper = {
     enable = true;
@@ -38,20 +38,27 @@
         gaps_in = 4;
         gaps_out = 8;
         border_size = 3;
-        "col.active_border" = "rgba(9ec9ffff)";
-        "col.inactive_border" = "rgba(9ec9ff99)";
+        "col.active_border" = "rgba(a1cbe4ff)";
+        "col.inactive_border" = "rgba(5f7b91cc)";
       };
 
       windowrule = [
         {
-          name = "chats";
-          "match:workspace" = "3";
-          monitor = "DP-1";
+          name = "workspace1-maximize";
+          "match:float" = false;
+          "match:workspace" = 1;
+          maximize = "on";
+        }
+        {
+          name = "terminal";
+          "match:class" = "org.wezfurlong.wezterm";
+          float = "off";
         }
         {
           name = "tg";
-          "match:class" = "org.telegram.desktop";
+          "match:title" = "AyuGram";
           workspace = 3;
+          monitor = 0;
         }
         {
           name = "firefox";
@@ -62,6 +69,13 @@
           name = "VPN";
           "match:class" = "AmneziaVPN";
           float = "on";
+          persistent_size = "on";
+        }
+        {
+          name = "VNC";
+          "match:class" = "org.kde.krdc";
+          float = "on";
+          persistent_size = "on";
         }
       ];
 
@@ -115,8 +129,9 @@
 
       bind = [
         "$mod, RETURN, exec, $terminal"
-        "$mod, C, killactive,"
-        "$mod, M, exit,"
+        "$mod, C, killactive"
+        "$mod SHIFT, C, forcekillactive"
+        "$mod, M, exit"
         "$mod, E, exec, $fileManager"
         "$mod, PRINT, exec, grim -g \"$(slurp)\" - | wl-copy"  # Manually select a region
         "$mod, Q, exec, $reload"
@@ -124,7 +139,7 @@
         "$mod, R, exec, $menu"
         "$mod, L, exec, $lock"
         "$mod, P, pseudo," # dwindle
-        "$mod, J, togglesplit," # dwindle
+        "$mod, |, layoutmsg, togglesplit" # dwindle
 
         # Move focus with mod + arrow keys
         "$mod, left, movefocus, l"
@@ -132,8 +147,19 @@
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
 
-        "$mod SHIFT, right, moveworkspacetomonitor, DP-1"
-        "$mod SHIFT, left, moveworkspacetomonitor, DP-2"
+        # Swap window with the next one on the current workspace
+        "$mod, Tab, swapnext,"
+        "$mod, G, togglegroup"
+        "$mod, H, changegroupactive, f"
+        "$mod SHIFT, H, changegroupactive, b"
+
+        # Focus the next window on the current workspace
+        "$mod, J, cyclenext,"
+
+        # Grouped "stacking" controls (tabbed windows)
+        "$mod, G, togglegroup,"
+        "$mod, K, changegroupactive, f"
+        "$mod SHIFT, K, changegroupactive, b"
 
         # Switch workspaces with mod + [0-9]
         "$mod, 1, workspace, 1"

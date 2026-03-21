@@ -14,7 +14,7 @@
 
         "modules-left"   = [ "custom/terminal" "clock" "tray" ];
         "modules-center" = [ "hyprland/workspaces" ];
-        "modules-right"  = [ "wireplumber" "cpu" "memory" "disk" ];
+        "modules-right"  = [ "custom/gamepad" "wireplumber" "cpu" "memory" "disk" ];
 
         "custom/terminal" = {
           format = "";
@@ -53,6 +53,14 @@
             "9"  = "り";
             "10" = "ぬ";
           };
+        };
+
+        "custom/gamepad" = {
+          interval = 5;
+          return-type = "json";
+          exec = "bash -lc 'devs=$(bluetoothctl devices Connected | cut -d\" \" -f2); for d in $devs; do info=$(bluetoothctl info \"$d\" 2>/dev/null); echo \"$info\" | grep -q \"Icon: input-gaming\" || continue; name=$(echo \"$info\" | sed -n \"s/^\\s*Name: //p\" | head -n1); [ -n \"$name\" ] || name=\"Gamepad\"; printf \"{\\\"text\\\":\\\"\\\",\\\"tooltip\\\":\\\"%s connected\\\",\\\"class\\\":\\\"connected\\\"}\" \"$name\"; exit 0; done; printf \"{\\\"text\\\":\\\"\\\",\\\"tooltip\\\":\\\"No gamepad connected\\\",\\\"class\\\":\\\"disconnected\\\"}\"'";
+          format = "{}";
+          on-click = "blueman-manager";
         };
 
         wireplumber = {
@@ -171,11 +179,19 @@
         border: 1px solid rgba(185, 191, 204, 0.90);
       }
 
+      /* Urgent workspace */
+      #workspaces button.urgent {
+        background-color: rgba(246, 210, 226, 0.95);
+        color: #8e4a6b;
+        border: 1px solid rgba(232, 170, 200, 0.95);
+      }
+
       #workspaces button:hover:not(.active):not(.focused) {
         background-color: rgba(230, 234, 242, 0.90);
       }
 
-      /* Right panel: volume, CPU, RAM, disk */
+      /* Right panel: gamepad, volume, CPU, RAM, disk */
+      #custom-gamepad,
       #wireplumber,
       #cpu,
       #memory,
@@ -188,6 +204,11 @@
         color: rgba(120, 126, 140, 0.75);
       }
 
+      #custom-gamepad.disconnected {
+        color: rgba(120, 126, 140, 0.75);
+      }
+
+      #custom-gamepad:hover,
       #wireplumber:hover,
       #cpu:hover,
       #memory:hover,

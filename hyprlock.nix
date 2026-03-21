@@ -58,7 +58,7 @@
           check_color = "rgba(190,210,220,0.95)";
           fail_color  = "rgba(230,160,160,0.95)";
 
-          placeholder_text = "  Unlock...";
+          placeholder_text = "パスワード...";
           fade_on_empty = false;
 
           position = "0, 110";

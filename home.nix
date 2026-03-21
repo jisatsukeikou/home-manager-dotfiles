@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-
+{ pkgs, ... }:
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -21,7 +20,7 @@
 
   imports = [
     # Include the results of the hardware scan
-    # ./dunst.nix
+    ./dunst.nix
     ./hyprland.nix
     ./hyprlock.nix
     ./rofi.nix
@@ -36,6 +35,7 @@
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     #discord
+    ayugram-desktop
     dunst
     fastfetch
     figma-linux
@@ -48,6 +48,7 @@
     kitty
     libreoffice
     pavucontrol
+    pinta
     slurp
     vscode-fhs
     wezterm
@@ -72,6 +73,23 @@
       interactiveShellInit = ''
         set fish_greeting
       '';
+      shellAliases = {
+      };
+      functions = {
+        nvenc = ''
+          set -l input $argv[1]
+          if test -z "$input"
+            echo "Usage: nvenc <input-file>"
+            return 1
+          end
+          if string match -qr '\.[^.]+$' -- "$input"
+            set -l output (string replace -r '\.[^.]*$' '.mp4' -- "$input")
+          else
+            set -l output "$input.mp4"
+          end
+          ffmpeg -c:v hevc_nvenc -c:a copy -i "$input" -profile:v main10 -pix_fmt p010le "$output"
+        '';
+      };
       # plugins = [
       #   # Enable a plugin (here grc for colorized command output) from nixpkgs
       #   {

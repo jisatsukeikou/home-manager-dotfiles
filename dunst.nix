@@ -1,20 +1,4 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
-
-let
-  inherit (lib) mkForce;
-
-  inherit (config.lib.stylix.colors.withHashtag)
-    base02
-    base03
-    base08
-    base0A
-    ;
-in
+{ pkgs, ... }:
 {
   services.dunst = {
     enable = true;
@@ -26,34 +10,53 @@ in
 
     settings = {
       global = {
-        follow = "keyboard";
+        follow = "none";
+        monitor = 1;
         width = 370;
         separator_height = 1;
-        padding = 24;
-        horizontal_padding = 24;
+        padding = 16;
+        horizontal_padding = 16;
+        origin = "bottom-right";
+        offset = "20x20";
         frame_width = 1;
         sort = "update";
         idle_threshold = 120;
-        alignment = "center";
+        alignment = "left";
         word_wrap = "yes";
-        transparency = 5;
+        transparency = 10;
         format = "<b>%s</b>: %b";
         markup = "full";
-        min_icon_size = 32;
-        max_icon_size = 128;
-        highlight = mkForce base03;
+        min_icon_size = 24;
+        max_icon_size = 64;
+
+        # Light silver theme
+        font = "JetBrainsMono Nerd Font 11";
+        background = "#F4F6FA";
+        foreground = "#4A4F5A";
+        frame_color = "#CDD2DC";
+        separator_color = "frame";
+        corner_radius = 10;
       };
 
       urgency_low = {
-        foreground = mkForce base0A;
-        frame_color = mkForce base02;
+        background = "#F8F9FC";
+        foreground = "#6A707C";
+        frame_color = "#DDE2EB";
+        timeout = 4;
       };
 
-      urgency_normal.frame_color = mkForce base02;
+      urgency_normal = {
+        background = "#F4F6FA";
+        foreground = "#4A4F5A";
+        frame_color = "#CDD2DC";
+        timeout = 7;
+      };
 
       urgency_critical = {
-        foreground = mkForce base08;
-        frame_color = mkForce base02;
+        background = "#F4F6FA";
+        foreground = "#9A5A5A";
+        frame_color = "#D89A9A";
+        timeout = 0;
       };
     };
   };
