@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -23,6 +23,7 @@
     ./dunst.nix
     ./hyprland.nix
     ./hyprlock.nix
+    ./hyprtoolkit.nix
     ./rofi.nix
     ./swayosd.nix
     ./wezterm.nix
@@ -32,6 +33,13 @@
 
   targets.genericLinux.enable = true;
 
+  # NixOS Hyprland/UWSM sets XDG_MENU_PREFIX=hyprland- in systemd; KDE needs plasma-
+  # for plasma-applications.menu (see hyprland.nix dbus-update-activation-environment).
+  home.sessionVariables = {
+    XDG_MENU_PREFIX = "plasma-";
+    QT_QPA_PLATFORMTHEME = "kde";
+  };
+
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     #discord
@@ -39,7 +47,6 @@
     dunst
     fastfetch
     figma-linux
-    flameshot
     grim
     helvum
     hyprpolkitagent
@@ -50,6 +57,7 @@
     pavucontrol
     pinta
     slurp
+    swappy
     vscode-fhs
     wezterm
     wl-clipboard

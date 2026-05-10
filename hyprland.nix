@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   services.hyprpaper = {
     enable = true;
@@ -43,12 +43,6 @@
       };
 
       windowrule = [
-        {
-          name = "workspace1-maximize";
-          "match:float" = false;
-          "match:workspace" = 1;
-          maximize = "on";
-        }
         {
           name = "terminal";
           "match:class" = "org.wezfurlong.wezterm";
@@ -127,17 +121,26 @@
         "DP-2, preferred, 2560x0, auto"
       ];
 
+      # Monocle on workspace 1 (stacked full-area windows). See:
+      # https://wiki.hypr.land/Configuring/Workspace-Rules/
+      # https://wiki.hypr.land/Configuring/Monocle-Layout/
+      workspace = [
+        "1, layout:monocle"
+      ];
+
       bind = [
         "$mod, RETURN, exec, $terminal"
         "$mod, C, killactive"
         "$mod SHIFT, C, forcekillactive"
         "$mod, M, exit"
         "$mod, E, exec, $fileManager"
-        "$mod, PRINT, exec, grim -g \"$(slurp)\" - | wl-copy"  # Manually select a region
+        "$mod, PRINT, exec, grim -g \"$(slurp)\" - | swappy -f -"  # Manually select a region
         "$mod, Q, exec, $reload"
         "$mod, V, togglefloating,"
         "$mod, R, exec, $menu"
         "$mod, L, exec, $lock"
+        "$mod, F, fullscreen, 0"
+        "$mod SHIFT, F, fullscreen, 1"
         "$mod, P, pseudo," # dwindle
         "$mod, |, layoutmsg, togglesplit" # dwindle
 
@@ -149,17 +152,16 @@
 
         # Swap window with the next one on the current workspace
         "$mod, Tab, swapnext,"
-        "$mod, G, togglegroup"
-        "$mod, H, changegroupactive, f"
-        "$mod SHIFT, H, changegroupactive, b"
-
-        # Focus the next window on the current workspace
-        "$mod, J, cyclenext,"
 
         # Grouped "stacking" controls (tabbed windows)
         "$mod, G, togglegroup,"
         "$mod, K, changegroupactive, f"
         "$mod SHIFT, K, changegroupactive, b"
+
+        # Cycle focus: use cyclenext tiled (works on monocle; plain cyclenext does not).
+        # No trailing comma after the last arg — an extra empty arg breaks layoutmsg/cyclenext.
+        "$mod, J, cyclenext, tiled"
+        "$mod SHIFT, J, cyclenext, prev tiled"
 
         # Switch workspaces with mod + [0-9]
         "$mod, 1, workspace, 1"
@@ -217,12 +219,14 @@
         "_JAVA_AWT_WM_NONREPARENTING,1"
         "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
         "QT_QPA_PLATFORM,wayland"
+        "QT_QPA_PLATFORMTHEME,kde"
         "SDL_VIDEODRIVER,wayland"
         "GDK_BACKEND,wayland"
         "LIBVA_DRIVER_NAME,nvidia"
         "XDG_SESSION_TYPE,wayland"
         "XDG_SESSION_DESKTOP,Hyprland"
         "XDG_CURRENT_DESKTOP,Hyprland"
+        "XDG_MENU_PREFIX,plasma-"
         "GBM_BACKEND,nvidia-drm"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
         "ANDROID_JAVA_HOME,${pkgs.jdk.home}"
@@ -235,7 +239,9 @@
         "${pkgs.wl-clipboard}/bin/wl-paste --type text --watch cliphist store"
         "${pkgs.wl-clipboard}/bin/wl-paste --type image --watch cliphist store"
         "eval $(gnome-keyring-daemon --start --components=secrets,ssh,gpg,pkcs11)"
-        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &"
+        # Push XDG_MENU_PREFIX into systemd user env; NixOS Hyprland session sets
+        # hyprland- here, which breaks KDE menu/MIME (Dolphin) — Hyprland env uses plasma- above.
+        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX &"
         "hash dbus-update-activation-environment 2>/dev/null"
         "export SSH_AUTH_SOCK"
         "systemctl --user start hyprpolkitagent"
@@ -245,6 +251,8 @@
       xwayland = {
         force_zero_scaling = true;
       };
+
+      # plugins = [ inputs.hyprWorkspaceLayouts.packages.${pkgs.system}.default ];
 
       misc = {
         focus_on_activate = true;
