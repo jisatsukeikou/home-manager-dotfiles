@@ -12,9 +12,14 @@
         height = 32;
         margin = "6 12 0 12";
 
-        "modules-left"   = [ "custom/terminal" "clock" "tray" ];
+        "modules-left"   = [ "custom/nixlogo" "custom/terminal" "tray" ];
         "modules-center" = [ "hyprland/workspaces" ];
-        "modules-right"  = [ "custom/gamepad" "wireplumber" "cpu" "memory" "disk" ];
+        "modules-right"  = [ "custom/gamepad" "wireplumber" "cpu" "memory" "disk" "clock" ];
+
+        "custom/nixlogo" = {
+          format = "  Nix";
+          tooltip = "NixOS";
+        };
 
         "custom/terminal" = {
           format = "";
@@ -78,7 +83,7 @@
 
         memory = {
           interval = 5;
-          format = " {used:0.1f}G";
+          format = " {used:0.1f}G";
         };
 
         disk = {
@@ -116,10 +121,21 @@
       .modules-center,
       .modules-right {
         background-color: rgba(244, 246, 250, 0.90);
-        border-radius: 10px;
+        border-radius: 24px;
         padding: 8px 16px;  /* taller panels */
         margin: 2px 8px;
         border: 1px solid rgba(205, 210, 220, 0.90);
+      }
+
+      .modules-center {
+        margin: 2px 4px;
+        padding: 4px 4px;
+      }
+
+      #custom-nixlogo {
+        padding: 0 0;
+        color: #4b6cb1;
+        font-size: 15px;
       }
 
       /* Terminal icon launcher */
@@ -152,10 +168,10 @@
       }
 
       #workspaces button {
-        padding: 0 11px;
+        padding: 0 4px;
         margin: 0 4px;
         background: transparent;
-        border-radius: 999px;
+        border-radius: 24px;
         font-size: 13px;
         font-weight: 700;
         transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;

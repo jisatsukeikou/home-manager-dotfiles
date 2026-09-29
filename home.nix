@@ -1,5 +1,23 @@
-{ pkgs, inputs, ... }:
-{
+{ pkgs, ... }:
+
+let
+  scripts = {
+    toggleAudio = pkgs.writeShellScriptBin "toggle-audio" ''
+      SEARCH_QUERY="$1"
+
+      TARGET_ID=$(wpctl status | awk '/Audio/,/Video/' | grep -i "$SEARCH_QUERY" | grep -oE '[0-9]+' | head -n 1)
+
+      if [ -z "$TARGET_ID" ]; then
+      echo "Error: No sink matching '$SEARCH_QUERY' was found."
+      exit 1
+      fi
+
+      wpctl set-default "$TARGET_ID"
+      echo "Default sink successfully set to ID $TARGET_ID (matching '$SEARCH_QUERY')."
+    '';
+  };
+
+in {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "ophanimous";
@@ -22,6 +40,7 @@
     # Include the results of the hardware scan
     ./dunst.nix
     ./hyprland.nix
+    ./hypridle.nix
     ./hyprlock.nix
     ./hyprtoolkit.nix
     ./rofi.nix
@@ -44,11 +63,12 @@
   home.packages = with pkgs; [
     #discord
     ayugram-desktop
+    brightnessctl
     dunst
     fastfetch
     figma-linux
+    grc
     grim
-    helvum
     hyprpolkitagent
     jdk
     keepass
@@ -61,15 +81,9 @@
     vscode-fhs
     wezterm
     wl-clipboard
+    zulip
 
-    (writeShellScriptBin "zapret" ''
-      #!${pkgs.bash}/bin/bash
-      ssh -q maint@172.16.10.1 "sudo zapret_toggle uncomment"
-    '')
-    (writeShellScriptBin "unzapret" ''
-      #!${pkgs.bash}/bin/bash
-      ssh -q maint@172.16.10.1 "sudo zapret_toggle comment"
-    '')
+    scripts.toggleAudio
   ];
 
   # Let Home Manager install and manage itself.
@@ -82,29 +96,28 @@
         set fish_greeting
       '';
       shellAliases = {
+        cls = "clear";
       };
       functions = {
-        nvenc = ''
-          set -l input $argv[1]
-          if test -z "$input"
-            echo "Usage: nvenc <input-file>"
-            return 1
-          end
-          if string match -qr '\.[^.]+$' -- "$input"
-            set -l output (string replace -r '\.[^.]*$' '.mp4' -- "$input")
-          else
-            set -l output "$input.mp4"
-          end
-          ffmpeg -c:v hevc_nvenc -c:a copy -i "$input" -profile:v main10 -pix_fmt p010le "$output"
-        '';
       };
-      # plugins = [
-      #   # Enable a plugin (here grc for colorized command output) from nixpkgs
-      #   {
-      #     name = "grc";
-      #     src = pkgs.fishPlugins.grc.src;
-      #   }
-      # ];
+      plugins = [
+        {
+          name = "grc";
+          src = pkgs.fishPlugins.grc.src;
+        }
+        {
+          name = "bobthefisher";
+          src = pkgs.fishPlugins.bobthefisher.src;
+        }
+        {
+          name = "you-should-use";
+          src = pkgs.fishPlugins.fish-you-should-use.src;
+        }
+        {
+          name = "colored-man-pages";
+          src = pkgs.fishPlugins.colored-man-pages.src;
+        }
+      ];
     };
 
     mpv = {
@@ -114,6 +127,24 @@
     rofi = {
       enable = true;
       package = pkgs.rofi.override { plugins = [ pkgs.rofi-emoji ]; };
+    };
+
+    neovim = {
+      enable = true;
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+    };
+
+    yazi = {
+      enable = true;
+      settings = {
+        preview = {
+          max_width = 3840;
+          max_height = 2160;
+          # ueberzug_scale = 1;
+        };
+      };
     };
   };
 

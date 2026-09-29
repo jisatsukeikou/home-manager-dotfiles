@@ -5,15 +5,21 @@
     settings = {
       ipc = "on";
       splash = true;
-      splash_offset = 2.0;
+      # splash_offset = 2.0;
 
       preload = [
         "~/Pictures/wallpaper.png"
       ];
 
       wallpaper = [
-        "DP-1,~/Pictures/wallpaper.png"
-        "DP-2,~/Pictures/wallpaper.png"
+        {
+          monitor = "DP-1";
+          path = "~/Pictures/wallpaper.png";
+        }
+        {
+          monitor = "DP-2";
+          path = "~/Pictures/wallpaper.png";
+        }
       ];
     };
   };
@@ -26,7 +32,7 @@
       enable = true;
     };
 
-     settings = {
+    settings = {
       "$terminal" = "wezterm";
       "$mod" = "SUPER";
       "$menu" = "rofi -show drun";
@@ -42,47 +48,47 @@
         "col.inactive_border" = "rgba(5f7b91cc)";
       };
 
+      # Clean Hyprland windowrule strings
       windowrule = [
         {
-          name = "terminal";
-          "match:class" = "org.wezfurlong.wezterm";
-          float = "off";
-        }
-        {
-          name = "tg";
-          "match:title" = "AyuGram";
-          workspace = 3;
-          monitor = 0;
-        }
-        {
-          name = "firefox";
-          "match:class" = "firefox";
+          name = "Firefox";
+          match = {
+            class = "firefox";
+          };
           workspace = 2;
         }
         {
-          name = "VPN";
-          "match:class" = "AmneziaVPN";
-          float = "on";
-          persistent_size = "on";
+          name = "Video";
+          match = {
+            class = "mpv";
+          };
+          float = true;
+          size = "{800 600}";
+          workspace = 3;
         }
         {
-          name = "VNC";
-          "match:class" = "org.kde.krdc";
-          float = "on";
-          persistent_size = "on";
+          name = "Amnezia";
+          match = {
+            class = "AmneziaVPN";
+          };
+          float = true;
+        }
+        {
+          name = "Work";
+          match = {
+            class = "^(chromium-browser|zulip)$";
+          };
+          workspace = 4;
         }
       ];
 
       decoration = {
-        # See https://wiki.hyprland.org/Configuring/Variables/ for more
-
         rounding = 10;
 
         blur = {
           enabled = true;
           size = 3;
           passes = 1;
-          new_optimizations = true;
         };
 
         shadow = {
@@ -96,7 +102,6 @@
       animations = {
         enabled = true;
 
-        # Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
         bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
 
         animation = [
@@ -111,9 +116,7 @@
       };
 
       dwindle = {
-        # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
-        pseudotile = true; # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
-        preserve_split = true; # you probably want this
+        preserve_split = true;
       };
 
       monitor = [
@@ -121,9 +124,6 @@
         "DP-2, preferred, 2560x0, auto"
       ];
 
-      # Monocle on workspace 1 (stacked full-area windows). See:
-      # https://wiki.hypr.land/Configuring/Workspace-Rules/
-      # https://wiki.hypr.land/Configuring/Monocle-Layout/
       workspace = [
         "1, layout:monocle"
       ];
@@ -134,36 +134,33 @@
         "$mod SHIFT, C, forcekillactive"
         "$mod, M, exit"
         "$mod, E, exec, $fileManager"
-        "$mod, PRINT, exec, grim -g \"$(slurp)\" - | swappy -f -"  # Manually select a region
+        "$mod, PRINT, exec, grim -g \"$(slurp)\" - | swappy -f -"
         "$mod, Q, exec, $reload"
         "$mod, V, togglefloating,"
         "$mod, R, exec, $menu"
         "$mod, L, exec, $lock"
         "$mod, F, fullscreen, 0"
         "$mod SHIFT, F, fullscreen, 1"
-        "$mod, P, pseudo," # dwindle
-        "$mod, |, layoutmsg, togglesplit" # dwindle
+        "$mod, P, pseudo,"
+        "$mod, space, layoutmsg, togglesplit"
 
-        # Move focus with mod + arrow keys
+        # Move focus
         "$mod, left, movefocus, l"
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
 
-        # Swap window with the next one on the current workspace
         "$mod, Tab, swapnext,"
 
-        # Grouped "stacking" controls (tabbed windows)
+        # Grouped controls
         "$mod, G, togglegroup,"
         "$mod, K, changegroupactive, f"
         "$mod SHIFT, K, changegroupactive, b"
 
-        # Cycle focus: use cyclenext tiled (works on monocle; plain cyclenext does not).
-        # No trailing comma after the last arg — an extra empty arg breaks layoutmsg/cyclenext.
         "$mod, J, cyclenext, tiled"
         "$mod SHIFT, J, cyclenext, prev tiled"
 
-        # Switch workspaces with mod + [0-9]
+        # Switch workspaces
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
@@ -175,7 +172,7 @@
         "$mod, 9, workspace, 9"
         "$mod, 0, workspace, 10"
 
-        # Move active window to a workspace with mod + SHIFT + [0-9]
+        # Move active window to workspace
         "$mod SHIFT, 1, movetoworkspace, 1"
         "$mod SHIFT, 2, movetoworkspace, 2"
         "$mod SHIFT, 3, movetoworkspace, 3"
@@ -187,17 +184,19 @@
         "$mod SHIFT, 9, movetoworkspace, 9"
         "$mod SHIFT, 0, movetoworkspace, 10"
 
-        # Example special workspace (scratchpad)
+        # Special workspace
         "$mod, S, togglespecialworkspace, magic"
         "$mod SHIFT, S, movetoworkspace, special:magic"
 
-        # Scroll through existing workspaces with mod + scroll
+        # Scroll workspaces
         "$mod, mouse_down, workspace, e+1"
         "$mod, mouse_up, workspace, e-1"
+
+        "$mod ALT, left, movecurrentworkspacetomonitor, l"
+        "$mod ALT, right, movecurrentworkspacetomonitor, r"
       ];
 
       bindm = [
-        # mouse movements
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
         "$mod ALT, mouse:272, resizewindow"
@@ -206,7 +205,7 @@
       input = {
         kb_layout = "us,ru";
         kb_options = "grp:ctrl_space_toggle,grp_led:scroll,compose:ralt";
-        follow_mouse = true;
+        follow_mouse = 1;
         accel_profile = "flat";
         sensitivity = 0;
       };
@@ -239,20 +238,15 @@
         "${pkgs.wl-clipboard}/bin/wl-paste --type text --watch cliphist store"
         "${pkgs.wl-clipboard}/bin/wl-paste --type image --watch cliphist store"
         "eval $(gnome-keyring-daemon --start --components=secrets,ssh,gpg,pkcs11)"
-        # Push XDG_MENU_PREFIX into systemd user env; NixOS Hyprland session sets
-        # hyprland- here, which breaks KDE menu/MIME (Dolphin) — Hyprland env uses plasma- above.
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_MENU_PREFIX &"
         "hash dbus-update-activation-environment 2>/dev/null"
         "export SSH_AUTH_SOCK"
         "systemctl --user start hyprpolkitagent"
-        #"waybar"
       ];
 
       xwayland = {
         force_zero_scaling = true;
       };
-
-      # plugins = [ inputs.hyprWorkspaceLayouts.packages.${pkgs.system}.default ];
 
       misc = {
         focus_on_activate = true;
